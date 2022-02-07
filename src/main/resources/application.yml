@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:15432/user_microservice
+    username: postgres
+    password: Postgres2019!
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
