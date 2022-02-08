@@ -1,13 +1,13 @@
-package services;
+package br.com.pedro.usermicroservice.services;
 
 import lombok.AllArgsConstructor;
-import model.UserEntity;
-import model.UserSecurity;
+import br.com.pedro.usermicroservice.model.UserEntity;
+import br.com.pedro.usermicroservice.model.UserSecurity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import repository.UserRepository;
+import br.com.pedro.usermicroservice.repository.UserRepository;
 
 import java.util.Optional;
 

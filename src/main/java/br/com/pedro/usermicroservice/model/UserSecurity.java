@@ -1,4 +1,4 @@
-package model;
+package br.com.pedro.usermicroservice.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
