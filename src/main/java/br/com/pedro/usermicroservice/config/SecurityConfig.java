@@ -1,7 +1,9 @@
 package br.com.pedro.usermicroservice.config;
 
+import br.com.pedro.usermicroservice.services.JWTAuthService;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -15,6 +17,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private UserDetailsService userSecurity;
     private PasswordEncoder passwordEncoder;
+    private AuthenticationManager authenticationManager;
+    private JWTAuthService authService;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -22,14 +26,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/api/v1/user/test").hasAnyRole("USER")
                 .anyRequest().fullyAuthenticated()
-                .and().httpBasic();
-                http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                .and().addFilter(new JWTFilter(authenticationManager, authService));
+        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 
     @Override
     public void configure(WebSecurity web) {
         web.ignoring()
-                .antMatchers("/api/v1/user/signup");
+                .antMatchers("/api/v1/user/signup")
+                .antMatchers("/api/v1/user/login");
     }
 
     @Override
