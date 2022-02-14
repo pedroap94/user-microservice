@@ -1,6 +1,7 @@
 package br.com.pedro.usermicroservice.services;
 
 import br.com.pedro.usermicroservice.dto.UserDto;
+import br.com.pedro.usermicroservice.exception.CreateUserException;
 import br.com.pedro.usermicroservice.model.UserEntity;
 import br.com.pedro.usermicroservice.repository.UserRepository;
 import br.com.pedro.usermicroservice.util.Role;
@@ -18,9 +19,14 @@ public class UserService {
     private PasswordEncoder passwordEncoder;
 
     public void signUp(UserDto userDto) {
-        userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        UserEntity user = modelMapper.map(userDto, UserEntity.class);
-        user.setAuthority(Role.USER.getRole());
-        userRepository.save(user);
+        try {
+            String encodedPassword = passwordEncoder.encode(userDto.getPassword());
+            userDto.setPassword(encodedPassword);
+            UserEntity user = modelMapper.map(userDto, UserEntity.class);
+            user.setAuthority(Role.USER.getRole());
+            userRepository.save(user);
+        } catch (Exception e){
+            throw new CreateUserException("Failed to create user");
+        }
     }
 }
