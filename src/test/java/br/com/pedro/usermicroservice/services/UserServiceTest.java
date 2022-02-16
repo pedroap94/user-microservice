@@ -8,16 +8,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
 class UserServiceTest {
-
-    @Mock
-    private UserRepository userRepository;
+    @InjectMocks
+    private UserService userService;
 
     @Mock
     private ModelMapper modelMapper;
@@ -25,11 +27,11 @@ class UserServiceTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
-    @InjectMocks
-    private UserService userService;
+    @Mock
+    private UserRepository userRepository;
 
     @BeforeEach
-    void setup(){
+    void setup() {
         MockitoAnnotations.openMocks(this);
     }
 
@@ -43,14 +45,17 @@ class UserServiceTest {
                 .username("teste")
                 .password("testing")
                 .build();
-
+        UserEntity user = new UserEntity();
+        user.setPassword(userTest.getPassword());
+        user.setUsername(userTest.getUsername());
 
         //Prepare testing
         Mockito.when(passwordEncoder.encode(userTest.getPassword())).thenReturn(userTest.getPassword());
-        Mockito.when(modelMapper.map(userTest, UserEntity.class)).thenReturn();
-        userService.signUp(userTest);
-        Assertions.assertThat(userRepository.findByUsername(userTest.getUsername())).isEqualTo(userTest);
+        Mockito.when(modelMapper.map(userTest, UserEntity.class)).thenReturn(user);
+        Mockito.when(userRepository.save(user)).thenReturn(user);
 
-
+        UserEntity response = userService.signUp(userTest);
+        Assertions.assertThat(response.getPassword()).isEqualTo(userTest.getPassword());
+        Assertions.assertThat(response.getUsername()).isEqualTo(userTest.getUsername());
     }
 }

@@ -18,13 +18,13 @@ public class UserService {
     private ModelMapper modelMapper;
     private PasswordEncoder passwordEncoder;
 
-    public void signUp(UserDto userDto) {
+    public UserEntity signUp(UserDto userDto) {
         try {
             String encodedPassword = passwordEncoder.encode(userDto.getPassword());
             userDto.setPassword(encodedPassword);
             UserEntity user = modelMapper.map(userDto, UserEntity.class);
             user.setAuthority(Role.USER.getRole());
-            userRepository.save(user);
+            return userRepository.save(user);
         } catch (Exception e){
             throw new CreateUserException("Failed to create user");
         }
