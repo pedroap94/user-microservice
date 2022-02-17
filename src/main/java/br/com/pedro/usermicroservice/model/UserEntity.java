@@ -4,10 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.math.BigInteger;
 
 @Entity
@@ -30,4 +27,6 @@ public class UserEntity {
     private String gender;
     private String email;
     private BigInteger phone;
+    @OneToOne
+    private Cart cart;
 }
