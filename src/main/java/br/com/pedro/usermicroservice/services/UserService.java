@@ -11,6 +11,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @AllArgsConstructor
 @Slf4j
@@ -33,5 +35,9 @@ public class UserService {
             log.error("Failed to create user");
             throw new CreateUserException("Failed to create user");
         }
+    }
+
+    public List<UserEntity> listAll(){
+        return userRepository.findAll();
     }
 }
