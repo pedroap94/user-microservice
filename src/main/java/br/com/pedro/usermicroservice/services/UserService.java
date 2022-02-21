@@ -6,12 +6,14 @@ import br.com.pedro.usermicroservice.model.UserEntity;
 import br.com.pedro.usermicroservice.repository.UserRepository;
 import br.com.pedro.usermicroservice.util.Role;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class UserService {
 
     private UserRepository userRepository;
@@ -24,8 +26,11 @@ public class UserService {
             userDto.setPassword(encodedPassword);
             UserEntity user = modelMapper.map(userDto, UserEntity.class);
             user.setAuthority(Role.USER.getRole());
-            return userRepository.save(user);
-        } catch (Exception e){
+            UserEntity userCreator = userRepository.save(user);
+            log.info("User created");
+            return userCreator;
+        } catch (Exception e) {
+            log.error("Failed to create user");
             throw new CreateUserException("Failed to create user");
         }
     }

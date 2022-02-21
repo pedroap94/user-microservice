@@ -3,15 +3,14 @@ package br.com.pedro.usermicroservice.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Entity
 @AllArgsConstructor
 @Data
+@Embeddable
 public class Cart {
 
     @Id
@@ -19,4 +18,5 @@ public class Cart {
     private Long id;
     private String item;
     private BigDecimal value;
+    private LocalDate date;
 }

@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @AllArgsConstructor
@@ -27,6 +29,7 @@ public class UserEntity {
     private String gender;
     private String email;
     private BigInteger phone;
-    @OneToOne
-    private Cart cart;
+//    @OneToOne
+    @Convert(converter = Converters.class)
+    private List<Cart> cart;
 }
