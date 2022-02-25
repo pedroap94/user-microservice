@@ -37,7 +37,8 @@ public class UserService {
         }
     }
 
-    public List<UserEntity> listAll(){
+    public List<UserEntity> listAll() {
         return userRepository.findAll();
     }
+
 }

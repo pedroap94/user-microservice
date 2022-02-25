@@ -19,4 +19,5 @@ public class Cart {
     private String item;
     private BigDecimal value;
     private LocalDate date;
+    private String username;
 }
