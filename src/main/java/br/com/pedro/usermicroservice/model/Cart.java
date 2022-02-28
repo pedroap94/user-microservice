@@ -2,6 +2,7 @@ package br.com.pedro.usermicroservice.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -9,6 +10,7 @@ import java.time.LocalDate;
 
 @Entity
 @AllArgsConstructor
+@NoArgsConstructor
 @Data
 @Embeddable
 public class Cart {
@@ -19,5 +21,6 @@ public class Cart {
     private String item;
     private BigDecimal value;
     private LocalDate date;
-    private String username;
+    @OneToOne(mappedBy = "cart")
+    private UserEntity userEntity;
 }

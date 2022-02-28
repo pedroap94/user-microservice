@@ -38,9 +38,4 @@ public class UserController {
     public ResponseEntity<String> login(@RequestBody UserDto userDto) {
         return new ResponseEntity<>(jwtAuthService.getJWT(userDto), HttpStatus.ACCEPTED);
     }
-
-    @GetMapping("list")
-    public ResponseEntity<List<UserEntity>> listAll(){
-        return new ResponseEntity<>(userService.listAll(), HttpStatus.OK);
-    }
 }

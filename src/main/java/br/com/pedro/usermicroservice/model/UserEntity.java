@@ -14,6 +14,7 @@ import java.math.BigInteger;
 public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
     //necessary to implement spring security
     private String username;
@@ -27,6 +28,7 @@ public class UserEntity {
     private String gender;
     private String email;
     private BigInteger phone;
-    @OneToOne
+    @OneToOne (cascade = CascadeType.ALL)
+    @JoinColumn(name="cart_id", referencedColumnName = "id")
     private Cart cart;
 }
