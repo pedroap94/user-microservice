@@ -7,14 +7,25 @@ import br.com.pedro.usermicroservice.model.UserEntity;
 import br.com.pedro.usermicroservice.repository.UserRepository;
 import br.com.pedro.usermicroservice.util.Role;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @AllArgsConstructor
 @Slf4j
+@NoArgsConstructor
 public class UserService {
 
     private UserRepository userRepository;
@@ -38,5 +49,24 @@ public class UserService {
             log.error("Failed to create user {0}", userDto.getUsername());
             throw new CreateUserException("Failed to create user");
         }
+    }
+
+    public UserEntity userToCart() throws Exception {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String s = authentication.getPrincipal().toString();
+            List<String> list = new ArrayList<>();
+            Matcher match = Pattern.compile("username=(.*?),").matcher(s);
+            if (match.find()) {
+                list.add(match.group(1));
+            }
+            Optional<UserEntity> userEntity = userRepository.findByUsername(list.get(0));
+            if (userEntity.isPresent()) {
+                return userEntity.get();
+            }
+        } catch (Exception e) {
+            throw new UsernameNotFoundException("User not found");
+        }
+        return null;
     }
 }

@@ -18,7 +18,7 @@ public class CartController {
     private CartService cartService;
 
     @PostMapping("add")
-    public ResponseEntity<Cart> cartAdd(@RequestBody Cart cart){
+    public ResponseEntity<Cart> cartAdd(@RequestBody Cart cart) throws Exception {
         return new ResponseEntity<>(cartService.cartAdd(cart), HttpStatus.CREATED);
     }
 }

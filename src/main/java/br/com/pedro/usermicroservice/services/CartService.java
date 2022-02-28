@@ -6,16 +6,7 @@ import br.com.pedro.usermicroservice.model.UserEntity;
 import br.com.pedro.usermicroservice.repository.CartRepository;
 import br.com.pedro.usermicroservice.repository.UserRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Service
 @AllArgsConstructor
@@ -35,20 +26,10 @@ public class CartService {
         }
     }
 
-    public Cart cartAdd(Cart cart) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String s = authentication.getPrincipal().toString();
-        List<String> list = new ArrayList<>();
-        Matcher match = Pattern.compile("username=(.*?),").matcher(s);
-        if (match.find()) {
-            list.add(match.group(1));
-        }
-        Optional<UserEntity> userEntity = userRepository.findByUsername(list.get(0));
-        if (userEntity.isPresent()) {
-            cart.setUserEntity(userEntity.get());
-        } else {
-            throw new UsernameNotFoundException("User not found");
-        }
+    public Cart cartAdd(Cart cart) throws Exception {
+        UserService userService = new UserService();
+        UserEntity user = userService.userToCart();
+        cart.setId(user.getId());
         return cartRepository.save(cart);
     }
 
