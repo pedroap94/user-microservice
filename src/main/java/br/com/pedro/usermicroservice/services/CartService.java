@@ -5,15 +5,19 @@ import br.com.pedro.usermicroservice.model.Cart;
 import br.com.pedro.usermicroservice.model.UserEntity;
 import br.com.pedro.usermicroservice.repository.CartRepository;
 import br.com.pedro.usermicroservice.repository.UserRepository;
-import lombok.AllArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 @Service
-@AllArgsConstructor
 public class CartService {
 
     private CartRepository cartRepository;
-    private UserRepository userRepository;
+    private UserService userService;
+
+    public CartService(CartRepository cartRepository, @Lazy UserService userService) {
+        this.cartRepository = cartRepository;
+        this.userService = userService;
+    }
 
     public Cart createCart(UserEntity user) {
         try {
@@ -26,8 +30,7 @@ public class CartService {
         }
     }
 
-    public Cart cartAdd(Cart cart) throws Exception {
-        UserService userService = new UserService();
+    public Cart cartAdd(Cart cart) {
         UserEntity user = userService.userToCart();
         cart.setId(user.getId());
         return cartRepository.save(cart);

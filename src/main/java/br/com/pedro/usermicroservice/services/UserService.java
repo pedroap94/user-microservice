@@ -7,7 +7,6 @@ import br.com.pedro.usermicroservice.model.UserEntity;
 import br.com.pedro.usermicroservice.repository.UserRepository;
 import br.com.pedro.usermicroservice.util.Role;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.core.Authentication;
@@ -25,7 +24,6 @@ import java.util.regex.Pattern;
 @Service
 @AllArgsConstructor
 @Slf4j
-@NoArgsConstructor
 public class UserService {
 
     private UserRepository userRepository;
@@ -46,12 +44,12 @@ public class UserService {
             log.info("User created");
             return userCreator;
         } catch (Exception e) {
-            log.error("Failed to create user {0}", userDto.getUsername());
+            log.error("Failed to create user " + userDto.getUsername());
             throw new CreateUserException("Failed to create user");
         }
     }
 
-    public UserEntity userToCart() throws Exception {
+    public UserEntity userToCart() {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String s = authentication.getPrincipal().toString();
