@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -49,15 +50,8 @@ public class UserService {
         }
     }
 
-    public UserEntity userToCart() {
+    public UserEntity userToCart(List<String> list) {
         try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            String s = authentication.getPrincipal().toString();
-            List<String> list = new ArrayList<>();
-            Matcher match = Pattern.compile("username=(.*?),").matcher(s);
-            if (match.find()) {
-                list.add(match.group(1));
-            }
             Optional<UserEntity> userEntity = userRepository.findByUsername(list.get(0));
             if (userEntity.isPresent()) {
                 return userEntity.get();

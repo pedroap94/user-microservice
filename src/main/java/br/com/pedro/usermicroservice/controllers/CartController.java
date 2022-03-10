@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.security.Principal;
+
 @Controller
 @RequestMapping("api/v1/cart")
 @AllArgsConstructor
@@ -18,7 +20,7 @@ public class CartController {
     private CartService cartService;
 
     @PostMapping("add")
-    public ResponseEntity<Cart> cartAdd(@RequestBody Cart cart) throws Exception {
+    public ResponseEntity<Cart> cartAdd(@RequestBody Cart cart) {
         return new ResponseEntity<>(cartService.cartAdd(cart), HttpStatus.CREATED);
     }
 }
