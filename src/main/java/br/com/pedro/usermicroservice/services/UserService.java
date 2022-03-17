@@ -50,9 +50,9 @@ public class UserService {
         }
     }
 
-    public UserEntity userToCart(List<String> list) {
+    public UserEntity userToCart(String username) {
         try {
-            Optional<UserEntity> userEntity = userRepository.findByUsername(list.get(0));
+            Optional<UserEntity> userEntity = userRepository.findByUsername(username);
             if (userEntity.isPresent()) {
                 return userEntity.get();
             }

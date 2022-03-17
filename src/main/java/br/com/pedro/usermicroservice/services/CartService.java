@@ -3,10 +3,12 @@ package br.com.pedro.usermicroservice.services;
 import br.com.pedro.usermicroservice.exception.CreateCartException;
 import br.com.pedro.usermicroservice.model.Cart;
 import br.com.pedro.usermicroservice.model.UserEntity;
+import br.com.pedro.usermicroservice.model.UserSecurity;
 import br.com.pedro.usermicroservice.repository.CartRepository;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -38,13 +40,9 @@ public class CartService {
 
     public Cart cartAdd(Cart cart) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String s = authentication.getPrincipal().toString();
-        List<String> list = new ArrayList<>();
-        Matcher match = Pattern.compile("username=(.*?),").matcher(s);
-        if (match.find()) {
-            list.add(match.group(1));
-        }
-        UserEntity user = userService.userToCart(list);
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String username = ((UserSecurity) userDetails).getUser().getUsername();
+        UserEntity user = userService.userToCart(username);
         cart.setId(user.getId());
         return cartRepository.save(cart);
     }
