@@ -11,16 +11,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 @Service
 public class CartService {
 
-    private CartRepository cartRepository;
-    private UserService userService;
+    private final CartRepository cartRepository;
+    private final UserService userService;
 
     public CartService(CartRepository cartRepository, @Lazy UserService userService) {
         this.cartRepository = cartRepository;
@@ -30,9 +25,7 @@ public class CartService {
     public Cart createCart(UserEntity user) {
         try {
             Cart cart = new Cart();
-//            cart.setUserEntity(user);
-            Cart save = cartRepository.save(cart);
-            return save;
+            return cartRepository.save(cart);
         } catch (Exception e) {
             throw new CreateCartException("Failed to create cart");
         }
