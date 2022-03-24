@@ -2,7 +2,6 @@ package br.com.pedro.usermicroservice.services;
 
 import br.com.pedro.usermicroservice.dto.UserDto;
 import br.com.pedro.usermicroservice.exception.CreateUserException;
-import br.com.pedro.usermicroservice.model.Cart;
 import br.com.pedro.usermicroservice.model.UserEntity;
 import br.com.pedro.usermicroservice.repository.UserRepository;
 import br.com.pedro.usermicroservice.util.Role;
@@ -23,20 +22,16 @@ public class UserService {
     private UserRepository userRepository;
     private ModelMapper modelMapper;
     private PasswordEncoder passwordEncoder;
-    private CartService cartService;
 
     public UserEntity signUp(UserDto userDto) {
         try {
             String encodedPassword = passwordEncoder.encode(userDto.getPassword());
             userDto.setPassword(encodedPassword);
             UserEntity user = modelMapper.map(userDto, UserEntity.class);
-            user.setAuthority(Role.USER.getRole());
-            userRepository.save(user);
-            Cart cart = cartService.createCart(user);
-            user.setCart(cart);
-            UserEntity userCreator = userRepository.save(user);
+            user.setAuthority(Role.USER.getDescription());
+            UserEntity userCreate = userRepository.save(user);
             log.info("User created");
-            return userCreator;
+            return userCreate;
         } catch (Exception e) {
             log.error("Failed to create user " + userDto.getUsername());
             throw new CreateUserException("Failed to create user");
@@ -53,5 +48,9 @@ public class UserService {
             throw new UsernameNotFoundException("User not found");
         }
         return null;
+    }
+
+    public UserEntity findById(Long id) {
+        return userRepository.findById(id).get();
     }
 }

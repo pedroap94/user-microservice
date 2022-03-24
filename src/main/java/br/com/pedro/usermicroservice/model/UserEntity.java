@@ -1,9 +1,14 @@
 package br.com.pedro.usermicroservice.model;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @AllArgsConstructor
@@ -27,7 +32,6 @@ public class UserEntity {
     private String gender;
     private String email;
     private BigInteger phone;
-    @OneToOne (cascade = CascadeType.ALL)
-    @JoinColumn(name="cart_id", referencedColumnName = "id")
-    private Cart cart;
+    @OneToMany(mappedBy = "userid")
+    private List<Cart> cart = new ArrayList<>();
 }

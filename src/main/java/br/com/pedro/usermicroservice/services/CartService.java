@@ -22,21 +22,21 @@ public class CartService {
         this.userService = userService;
     }
 
-    public Cart createCart(UserEntity user) {
-        try {
-            Cart cart = new Cart();
-            return cartRepository.save(cart);
-        } catch (Exception e) {
-            throw new CreateCartException("Failed to create cart");
-        }
-    }
+//    public Cart createCart() {
+//        try {
+//            Cart cart = new Cart();
+//            return cartRepository.save(cart);
+//        } catch (Exception e) {
+//            throw new CreateCartException("Failed to create cart");
+//        }
+//    }
 
     public Cart cartAdd(Cart cart) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         String username = ((UserSecurity) userDetails).getUser().getUsername();
         UserEntity user = userService.userToCart(username);
-        cart.setId(user.getId());
+        cart.setUserid(user);
         return cartRepository.save(cart);
     }
 

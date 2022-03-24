@@ -1,9 +1,10 @@
 package br.com.pedro.usermicroservice.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 @Entity
@@ -12,14 +13,18 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @Embeddable
+@Builder
 public class Cart {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String item;
-    private BigDecimal value;
+    private Long idItem;
     private LocalDate date;
-    @OneToOne(mappedBy = "cart")
-    private UserEntity userEntity;
+    @NotNull(message = "Quantity can't be null")
+    private Integer quantity;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    @JsonIgnore
+    private UserEntity userid;
 }
