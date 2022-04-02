@@ -18,8 +18,8 @@ import java.util.List;
 public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
+    @Column(name = "idOfUser")
+    private Long idOfUser;
     //necessary to implement spring security
     private String username;
     private String password;
@@ -32,6 +32,7 @@ public class UserEntity {
     private String gender;
     private String email;
     private BigInteger phone;
-    @OneToMany(mappedBy = "userid")
+    @OneToMany(mappedBy = "usuarioId")
     private List<Cart> cart = new ArrayList<>();
+
 }

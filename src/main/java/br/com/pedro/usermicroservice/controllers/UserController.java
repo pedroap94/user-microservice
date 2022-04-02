@@ -38,4 +38,9 @@ public class UserController {
     public ResponseEntity<UserEntity> findById(@RequestParam Long id){
         return new ResponseEntity<>(userService.findById(id), HttpStatus.ACCEPTED);
     }
+
+    @PutMapping
+    public ResponseEntity<UserEntity> update(@RequestBody UserDto userDto){
+        return new ResponseEntity<>(userService.updateUser(userDto), HttpStatus.OK);
+    }
 }

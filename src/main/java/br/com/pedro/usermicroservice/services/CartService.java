@@ -36,7 +36,7 @@ public class CartService {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         String username = ((UserSecurity) userDetails).getUser().getUsername();
         UserEntity user = userService.userToCart(username);
-        cart.setUserid(user);
+        cart.setUsuarioId(user);
         return cartRepository.save(cart);
     }
 

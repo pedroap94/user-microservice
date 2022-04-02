@@ -12,6 +12,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -52,5 +56,24 @@ public class UserService {
 
     public UserEntity findById(Long id) {
         return userRepository.findById(id).get();
+    }
+
+    public UserEntity updateUser(UserDto userDto) {
+        EntityManagerFactory emf = Persistence
+                .createEntityManagerFactory("br.com.userentity");
+        EntityManager em = emf.createEntityManager();
+        Optional<UserEntity> userInDatabase = userRepository.findByUsername(userDto.getUsername());
+        UserEntity userUpdated = modelMapper.map(userDto, UserEntity.class);
+        if (userInDatabase.isPresent()) {
+            userUpdated.setIdOfUser(userInDatabase.get().getIdOfUser());
+        } else {
+            throw new NoSuchElementException("User doesn't exist");
+        }
+        em.getTransaction().begin();
+        em.merge(userUpdated);
+        em.getTransaction().commit();
+        em.close();
+        emf.close();
+        return userRepository.findByUsername(userUpdated.getUsername()).get();
     }
 }

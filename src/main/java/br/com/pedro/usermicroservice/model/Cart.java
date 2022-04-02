@@ -26,5 +26,5 @@ public class Cart {
     @ManyToOne
     @JoinColumn(name = "user_id")
     @JsonIgnore
-    private UserEntity userid;
+    private UserEntity usuarioId;
 }
