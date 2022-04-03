@@ -16,6 +16,6 @@ public class UserDto {
     private Integer cep;
     private Integer age;
     private String gender;
-    private BigInteger phone;
+    private String phone;
     private String email;
 }

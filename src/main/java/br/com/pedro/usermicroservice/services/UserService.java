@@ -2,13 +2,13 @@ package br.com.pedro.usermicroservice.services;
 
 import br.com.pedro.usermicroservice.dto.UserDto;
 import br.com.pedro.usermicroservice.exception.CreateUserException;
+import br.com.pedro.usermicroservice.exception.DeleteUserException;
 import br.com.pedro.usermicroservice.model.UserEntity;
 import br.com.pedro.usermicroservice.repository.UserRepository;
 import br.com.pedro.usermicroservice.util.Role;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
@@ -31,6 +31,10 @@ public class UserService {
 
     public UserEntity signUp(UserDto userDto) {
         try {
+            Optional<UserEntity> verifyUsernameNotInUse = userRepository.findByUsername(userDto.getUsername());
+            if (verifyUsernameNotInUse.isPresent()) {
+                throw new CreateUserException("Username already in use");
+            }
             String encodedPassword = passwordEncoder.encode(userDto.getPassword());
             userDto.setPassword(encodedPassword);
             UserEntity user = modelMapper.map(userDto, UserEntity.class);
@@ -38,6 +42,9 @@ public class UserService {
             UserEntity userCreate = userRepository.save(user);
             log.info("User created");
             return userCreate;
+        } catch (CreateUserException e) {
+            log.error("Username " + userDto.getUsername() + " is already in use");
+            throw new CreateUserException("Username already in use");
         } catch (Exception e) {
             log.error("Failed to create user " + userDto.getUsername());
             throw new CreateUserException("Failed to create user");
@@ -56,8 +63,12 @@ public class UserService {
         return null;
     }
 
-    public UserEntity findById(Long id) {
-        return userRepository.findById(id).get();
+    public UserEntity findByUsername(String username) {
+        Optional<UserEntity> userOptional = userRepository.findByUsername(username);
+        if (userOptional.isPresent()) {
+            return userOptional.get();
+        }
+        throw new UsernameNotFoundException("User doesn't exist");
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
@@ -79,6 +90,16 @@ public class UserService {
         int rowsAffected = query.executeUpdate();
         if (rowsAffected == 0) {
             throw new UsernameNotFoundException("User doesn't exist");
+        }
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void deleteUser(String username) {
+        Query query = entityManager.createQuery("delete from UserEntity user where user.username=:username");
+        query.setParameter("username", username);
+        int rowsAffected = query.executeUpdate();
+        if (rowsAffected == 0) {
+            throw new DeleteUserException("Failed to delete user");
         }
     }
 }

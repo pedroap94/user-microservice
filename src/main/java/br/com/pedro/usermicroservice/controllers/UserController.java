@@ -11,19 +11,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
-@RequestMapping("api/v1/user")
+@RequestMapping("api/v1/users")
 @AllArgsConstructor
 public class UserController {
 
     private UserService userService;
     private JWTAuthService jwtAuthService;
 
-    @GetMapping("test")
-    public ResponseEntity<String> testSecurity() {
-        return new ResponseEntity<>("Work!", HttpStatus.OK);
-    }
-
-    @PostMapping("signup")
+    @PostMapping()
     public ResponseEntity<Void> signUp(@RequestBody UserDto userDto) {
         userService.signUp(userDto);
         return new ResponseEntity<>(null, HttpStatus.CREATED);
@@ -35,14 +30,19 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<UserEntity> findById(@RequestParam Long id){
-        return new ResponseEntity<>(userService.findById(id), HttpStatus.ACCEPTED);
+    public ResponseEntity<UserEntity> findById(@RequestParam String username) {
+        return new ResponseEntity<>(userService.findByUsername(username), HttpStatus.ACCEPTED);
     }
 
     @PutMapping
-    public ResponseEntity update(@RequestBody UserDto userDto){
-//        return new ResponseEntity<>(userService.updateUser(userDto), HttpStatus.OK);
+    public ResponseEntity<Void> update(@RequestBody UserDto userDto) {
         userService.updateUser(userDto);
-        return new ResponseEntity(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @DeleteMapping
+    public ResponseEntity<Void> delete(@RequestParam String username) {
+        userService.deleteUser(username);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
