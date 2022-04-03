@@ -8,17 +8,18 @@ import br.com.pedro.usermicroservice.util.Role;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import java.util.NoSuchElementException;
+import javax.persistence.Query;
 import java.util.Optional;
 
-@Service
+@Repository
 @AllArgsConstructor
 @Slf4j
 public class UserService {
@@ -26,6 +27,7 @@ public class UserService {
     private UserRepository userRepository;
     private ModelMapper modelMapper;
     private PasswordEncoder passwordEncoder;
+    private EntityManager entityManager;
 
     public UserEntity signUp(UserDto userDto) {
         try {
@@ -58,22 +60,25 @@ public class UserService {
         return userRepository.findById(id).get();
     }
 
-    public UserEntity updateUser(UserDto userDto) {
-        EntityManagerFactory emf = Persistence
-                .createEntityManagerFactory("br.com.userentity");
-        EntityManager em = emf.createEntityManager();
-        Optional<UserEntity> userInDatabase = userRepository.findByUsername(userDto.getUsername());
-        UserEntity userUpdated = modelMapper.map(userDto, UserEntity.class);
-        if (userInDatabase.isPresent()) {
-            userUpdated.setIdOfUser(userInDatabase.get().getIdOfUser());
-        } else {
-            throw new NoSuchElementException("User doesn't exist");
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void updateUser(UserDto userDto) {
+        Query query = entityManager.createQuery("update UserEntity user set user.age=:age, " +
+                "user.address=:address," +
+                "user.cep=:cep," +
+                "user.email=:email," +
+                "user.phone=:phone," +
+                "user.gender=:gender" +
+                " where user.username=:username");
+        query.setParameter("age", userDto.getAge());
+        query.setParameter("address", userDto.getAddress());
+        query.setParameter("cep", userDto.getCep());
+        query.setParameter("email", userDto.getEmail());
+        query.setParameter("phone", userDto.getPhone());
+        query.setParameter("gender", userDto.getGender());
+        query.setParameter("username", userDto.getUsername());
+        int rowsAffected = query.executeUpdate();
+        if (rowsAffected == 0) {
+            throw new UsernameNotFoundException("User doesn't exist");
         }
-        em.getTransaction().begin();
-        em.merge(userUpdated);
-        em.getTransaction().commit();
-        em.close();
-        emf.close();
-        return userRepository.findByUsername(userUpdated.getUsername()).get();
     }
 }

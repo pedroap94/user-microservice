@@ -18,7 +18,7 @@ import java.util.List;
 public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "idOfUser")
+    @Column(name = "id_of_user")
     private Long idOfUser;
     //necessary to implement spring security
     private String username;
