@@ -1,5 +1,6 @@
 package br.com.pedro.usermicroservice.controllers;
 
+import br.com.pedro.usermicroservice.dto.CartDto;
 import br.com.pedro.usermicroservice.model.Cart;
 import br.com.pedro.usermicroservice.services.CartService;
 import lombok.AllArgsConstructor;
@@ -18,7 +19,7 @@ public class CartController {
     private CartService cartService;
 
     @PostMapping("add")
-    public ResponseEntity<Cart> cartAdd(@RequestBody Cart cart) {
-        return new ResponseEntity<>(cartService.cartAdd(cart), HttpStatus.CREATED);
+    public ResponseEntity<Cart> cartAdd(@RequestBody CartDto cartDto) {
+        return new ResponseEntity<>(cartService.cartAdd(cartDto), HttpStatus.CREATED);
     }
 }
