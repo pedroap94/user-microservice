@@ -7,9 +7,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+
+import javax.websocket.server.PathParam;
 
 @Controller
 @RequestMapping("api/v1/cart")
@@ -21,5 +21,11 @@ public class CartController {
     @PostMapping("add")
     public ResponseEntity<Cart> cartAdd(@RequestBody CartDto cartDto) {
         return new ResponseEntity<>(cartService.cartAdd(cartDto), HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/{idItem}")
+    public ResponseEntity<Void> cartDelete(@PathVariable Long idItem){
+        cartService.cartDelete(idItem);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

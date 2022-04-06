@@ -18,7 +18,7 @@ public class UserController {
     private UserService userService;
     private JWTAuthService jwtAuthService;
 
-    @PostMapping()
+    @PostMapping("create")
     public ResponseEntity<Void> signUp(@RequestBody UserDto userDto) {
         userService.signUp(userDto);
         return new ResponseEntity<>(null, HttpStatus.CREATED);
