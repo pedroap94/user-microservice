@@ -9,8 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import javax.websocket.server.PathParam;
-
 @Controller
 @RequestMapping("api/v1/cart")
 @AllArgsConstructor
@@ -19,13 +17,20 @@ public class CartController {
     private CartService cartService;
 
     @PostMapping("add")
-    public ResponseEntity<Cart> cartAdd(@RequestBody CartDto cartDto) {
-        return new ResponseEntity<>(cartService.cartAdd(cartDto), HttpStatus.CREATED);
+    public ResponseEntity<Void> cartAdd(@RequestBody CartDto cartDto) {
+        cartService.cartAdd(cartDto);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{idItem}")
-    public ResponseEntity<Void> cartDelete(@PathVariable Long idItem){
+    public ResponseEntity<Void> cartDelete(@PathVariable Long idItem) {
         cartService.cartDelete(idItem);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PatchMapping
+    public ResponseEntity<Void> cartUpdate(@RequestBody CartDto cartDto) {
+        cartService.cartUpdate(cartDto);
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 }

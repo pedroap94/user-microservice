@@ -35,24 +35,22 @@ public class CartService {
         this.entityManager = entityManager;
     }
 
-    public Cart cartAdd(CartDto cartDto) {
-        Cart cart = modelMapper.map(cartDto, Cart.class);
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        String username = ((UserSecurity) userDetails).getUser().getUsername();
-        UserEntity user = userService.userToCart(username);
-        cart.setUsuarioId(user);
-        cart.setDate(LocalDate.now());
-        return cartRepository.save(cart);
+    public void cartAdd(CartDto cartDto) {
+        try {
+            Cart cart = modelMapper.map(cartDto, Cart.class);
+            UserEntity user = userAuthenticated();
+            cart.setUsuarioId(user);
+            cart.setDate(LocalDate.now());
+            cartRepository.save(cart);
+        } catch (Exception e){
+            throw new CartException(e.getMessage());
+        }
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
     public void cartDelete(Long idItem) {
         try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            String username = ((UserSecurity) userDetails).getUser().getUsername();
-            UserEntity user = userService.userToCart(username);
+            UserEntity user = userAuthenticated();
             Query query = entityManager.createQuery("delete Cart c where (c.usuarioId = :userId and c.idItem = :idItem)");
             query.setParameter("userId", user);
             query.setParameter("idItem", idItem);
@@ -67,8 +65,30 @@ public class CartService {
         }
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
     public void cartUpdate(CartDto cartDto) {
+        try {
+            Query query = entityManager
+                    .createQuery("update Cart c set c.quantity = :quantity where (c.usuarioId = :user and c.idItem = :idItem)");
+            query.setParameter("quantity", cartDto.getQuantity());
+            query.setParameter("user", userAuthenticated());
+            query.setParameter("idItem", cartDto.getIdItem());
+            int rowsAffected = query.executeUpdate();
+            if (rowsAffected == 0) {
+                throw new CartNotFoundException("");
+            }
+        } catch (CartNotFoundException e) {
+            throw new CartNotFoundException("Item not found");
+        } catch (Exception e) {
+            throw new CartException(e.getMessage());
+        }
+    }
 
+    private UserEntity userAuthenticated() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String username = ((UserSecurity) userDetails).getUser().getUsername();
+        return userService.userToCart(username);
     }
 
 }
