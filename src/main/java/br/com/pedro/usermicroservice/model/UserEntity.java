@@ -24,7 +24,7 @@ public class UserEntity {
     private String username;
     private String password;
     private String authority;
-    private String secret;
+    private String salt;
     //others user's data to statistics and utilities
     private String address;
     private Integer cep;

@@ -1,6 +1,7 @@
 package br.com.pedro.usermicroservice.services;
 
 import br.com.pedro.usermicroservice.dto.UserDto;
+import br.com.pedro.usermicroservice.exception.CreateUserException;
 import br.com.pedro.usermicroservice.model.UserEntity;
 import br.com.pedro.usermicroservice.repository.UserRepository;
 import org.assertj.core.api.Assertions;
@@ -13,8 +14,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.modelmapper.ModelMapper;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import java.util.Optional;
 
 @ExtendWith(SpringExtension.class)
 class UserServiceTest {
@@ -23,9 +25,6 @@ class UserServiceTest {
 
     @Mock
     private ModelMapper modelMapper;
-
-    @Mock
-    private PasswordEncoder passwordEncoder;
 
     @Mock
     private UserRepository userRepository;
@@ -41,21 +40,41 @@ class UserServiceTest {
     void whenSendUserDtoToCreateIsSuccessful() {
         //Scenario preparation
 
-        UserDto userTest = UserDto.builder()
-                .username("teste")
-                .password("testing")
-                .build();
+        UserDto userTest = generateUserDto();
         UserEntity user = new UserEntity();
         user.setPassword(userTest.getPassword());
         user.setUsername(userTest.getUsername());
 
         //Prepare testing
-        Mockito.when(passwordEncoder.encode(userTest.getPassword())).thenReturn(userTest.getPassword());
         Mockito.when(modelMapper.map(userTest, UserEntity.class)).thenReturn(user);
         Mockito.when(userRepository.save(user)).thenReturn(user);
 
         UserEntity response = userService.signUp(userTest);
-        Assertions.assertThat(response.getPassword()).isEqualTo(userTest.getPassword());
         Assertions.assertThat(response.getUsername()).isEqualTo(userTest.getUsername());
+    }
+
+    @Test
+    void whenSendRepeatedUserEntityThrowException() {
+        UserDto userTest = generateUserDto();
+        UserEntity user = new UserEntity();
+        user.setPassword(userTest.getPassword());
+        user.setUsername(userTest.getUsername());
+        Optional<UserEntity> userEntityOptional = Optional.of(user);
+
+        Mockito.when(modelMapper.map(userTest, UserEntity.class)).thenReturn(user);
+        Mockito.when(userRepository.save(user)).thenReturn(user);
+        Mockito.when(userRepository.findByUsername(Mockito.anyString())).thenReturn(userEntityOptional);
+
+        Exception exception = org.junit.jupiter.api.Assertions.assertThrows(CreateUserException.class, () -> {
+            userService.signUp(userTest);
+        });
+        org.junit.jupiter.api.Assertions.assertTrue(exception.getMessage().contains("Username already in use"));
+    }
+
+    private UserDto generateUserDto() {
+        return UserDto.builder()
+                .username("teste")
+                .password("testing")
+                .build();
     }
 }

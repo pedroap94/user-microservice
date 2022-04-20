@@ -8,15 +8,18 @@ import br.com.pedro.usermicroservice.repository.UserRepository;
 import br.com.pedro.usermicroservice.util.Role;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
 
 @Repository
@@ -26,7 +29,6 @@ public class UserService {
 
     private UserRepository userRepository;
     private ModelMapper modelMapper;
-    private PasswordEncoder passwordEncoder;
     private EntityManager entityManager;
 
     public UserEntity signUp(UserDto userDto) {
@@ -35,10 +37,11 @@ public class UserService {
             if (verifyUsernameNotInUse.isPresent()) {
                 throw new CreateUserException("Username already in use");
             }
-            String encodedPassword = passwordEncoder.encode(userDto.getPassword());
-            userDto.setPassword(encodedPassword);
+            String salt = RandomStringUtils.random(5, true, true);
+            userDto.setPassword(generatePassword(userDto.getPassword(), salt));
             UserEntity user = modelMapper.map(userDto, UserEntity.class);
             user.setAuthority(Role.USER.getDescription());
+            user.setSalt(salt);
             UserEntity userCreate = userRepository.save(user);
             log.info("User created");
             return userCreate;
@@ -101,5 +104,18 @@ public class UserService {
         if (rowsAffected == 0) {
             throw new DeleteUserException("Failed to delete user");
         }
+    }
+
+    private String generatePassword(String password, String salt) throws NoSuchAlgorithmException {
+        String passwordWithSalt = password + salt;
+
+        MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+        byte[] byteMessage = messageDigest.digest(passwordWithSalt.getBytes(StandardCharsets.UTF_8));
+
+        StringBuilder passwordReturn = new StringBuilder();
+        for (byte transformByteInMessage : byteMessage) {
+            passwordReturn.append(transformByteInMessage);
+        }
+        return passwordReturn.toString();
     }
 }
